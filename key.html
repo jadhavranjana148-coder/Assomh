@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Verification</title>
+
+<style>
+
+body{
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:Arial;
+margin:0;
+}
+
+.container{
+width:90%;
+max-width:400px;
+text-align:center;
+}
+
+h2{
+color:white;
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+height:60px;
+font-size:22px;
+text-align:center;
+border:none;
+border-radius:15px;
+outline:none;
+background:#111;
+color:white;
+}
+
+button{
+margin-top:20px;
+width:100%;
+height:55px;
+font-size:20px;
+border:none;
+border-radius:15px;
+background:#00aaff;
+color:white;
+}
+
+.error{
+box-shadow:0 0 15px red;
+}
+
+.success{
+box-shadow:0 0 15px #00bfff;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Owner Verification</h2>
+
+<input
+id="owner"
+type="text"
+autocomplete="off"
+autocorrect="off"
+spellcheck="false"
+placeholder="Enter Key">
+
+<button onclick="checkKey()">Unlock</button>
+
+</div>
+
+<script>
+
+function checkKey(){
+
+const input =
+document.getElementById("owner");
+
+if(
+input.value ===
+"My asmita"
+){
+
+input.classList.add("success");
+
+setTimeout(()=>{
+
+location.href =
+"image.html";
+
+},800);
+
+}
+else{
+
+input.classList.add("error");
+
+setTimeout(()=>{
+
+input.classList.remove("error");
+input.value="";
+
+},1000);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

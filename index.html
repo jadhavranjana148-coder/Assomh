@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pattern Lock</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#000;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:Arial,sans-serif;
+overflow:hidden;
+}
+
+.lock-container{
+position:relative;
+width:320px;
+height:320px;
+}
+
+svg{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+}
+
+.grid{
+width:100%;
+height:100%;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+grid-template-rows:repeat(3,1fr);
+place-items:center;
+}
+
+.dot{
+width:24px;
+height:24px;
+background:white;
+border-radius:50%;
+transition:.2s;
+}
+
+.dot.active{
+background:#00bfff;
+box-shadow:0 0 15px #00bfff;
+}
+
+.dot.error{
+background:red;
+box-shadow:0 0 15px red;
+}
+
+.title{
+position:absolute;
+top:-70px;
+width:100%;
+text-align:center;
+color:white;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="lock-container">
+
+<div class="title">
+Pattern Lock
+</div>
+
+<svg id="svg">
+<polyline
+id="line"
+fill="none"
+stroke="white"
+stroke-width="8"
+stroke-linecap="round"
+stroke-linejoin="round"
+/>
+</svg>
+
+<div class="grid">
+
+<div class="dot" data-id="1"></div>
+<div class="dot" data-id="2"></div>
+<div class="dot" data-id="3"></div>
+
+<div class="dot" data-id="4"></div>
+<div class="dot" data-id="5"></div>
+<div class="dot" data-id="6"></div>
+
+<div class="dot" data-id="7"></div>
+<div class="dot" data-id="8"></div>
+<div class="dot" data-id="9"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const CORRECT =
+"3,2,1,4,5,6,9,8,7";
+
+const dots =
+document.querySelectorAll(".dot");
+
+const polyline =
+document.getElementById("line");
+
+let pattern = [];
+let points = [];
+let drawing = false;
+
+function center(dot){
+
+const rect =
+dot.getBoundingClientRect();
+
+const parent =
+document.querySelector(".lock-container")
+.getBoundingClientRect();
+
+return {
+x:rect.left-parent.left+rect.width/2,
+y:rect.top-parent.top+rect.height/2
+};
+
+}
+
+function updateLine(){
+
+polyline.setAttribute(
+"points",
+points.map(
+p=>`${p.x},${p.y}`
+).join(" ")
+);
+
+}
+
+function addDot(dot){
+
+const id = dot.dataset.id;
+
+if(pattern.includes(id))
+return;
+
+pattern.push(id);
+
+dot.classList.add("active");
+
+const pos =
+center(dot);
+
+points.push(pos);
+
+updateLine();
+
+}
+
+dots.forEach(dot=>{
+
+dot.addEventListener(
+"touchstart",
+e=>{
+
+e.preventDefault();
+
+if(!drawing){
+
+drawing=true;
+
+pattern=[];
+points=[];
+
+polyline.setAttribute(
+"stroke",
+"white"
+);
+
+polyline.setAttribute(
+"points",
+""
+);
+
+dots.forEach(d=>{
+d.classList.remove(
+"active",
+"error"
+);
+});
+
+}
+
+addDot(dot);
+
+}
+);
+
+dot.addEventListener(
+"mousedown",
+()=>{
+
+if(!drawing){
+
+drawing=true;
+
+pattern=[];
+points=[];
+
+polyline.setAttribute(
+"stroke",
+"white"
+);
+
+polyline.setAttribute(
+"points",
+""
+);
+
+dots.forEach(d=>{
+d.classList.remove(
+"active",
+"error"
+);
+});
+
+}
+
+addDot(dot);
+
+}
+);
+
+});
+
+document.addEventListener(
+"touchmove",
+e=>{
+
+if(!drawing) return;
+
+const touch =
+e.touches[0];
+
+dots.forEach(dot=>{
+
+const r =
+dot.getBoundingClientRect();
+
+if(
+touch.clientX>=r.left &&
+touch.clientX<=r.right &&
+touch.clientY>=r.top &&
+touch.clientY<=r.bottom
+){
+
+addDot(dot);
+
+}
+
+});
+
+}
+);
+
+document.addEventListener(
+"mousemove",
+e=>{
+
+if(!drawing) return;
+
+dots.forEach(dot=>{
+
+const r =
+dot.getBoundingClientRect();
+
+if(
+e.clientX>=r.left &&
+e.clientX<=r.right &&
+e.clientY>=r.top &&
+e.clientY<=r.bottom
+){
+
+addDot(dot);
+
+}
+
+});
+
+}
+);
+
+function finish(){
+
+if(!drawing) return;
+
+drawing=false;
+
+const result =
+pattern.join(",");
+
+if(result===CORRECT){
+
+polyline.setAttribute(
+"stroke",
+"#00bfff"
+);
+
+setTimeout(()=>{
+
+location.href =
+"pin.html";
+
+},800);
+
+}
+else{
+
+polyline.setAttribute(
+"stroke",
+"red"
+);
+
+dots.forEach(d=>{
+d.classList.add("error");
+});
+
+setTimeout(()=>{
+
+pattern=[];
+points=[];
+
+polyline.setAttribute(
+"points",
+""
+);
+
+dots.forEach(d=>{
+d.classList.remove(
+"active",
+"error"
+);
+});
+
+},1000);
+
+}
+
+}
+
+document.addEventListener(
+"touchend",
+finish
+);
+
+document.addEventListener(
+"mouseup",
+finish
+);
+
+</script>
+
+</body>
+</html>
